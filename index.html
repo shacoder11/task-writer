@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-image: url(bg.jpg);
+        background-size: cover;  /* Optional: Ensures the image covers the entire background */
+  background-position: center;  /* Optional: Centers the image */
+  background-repeat: no-repeat;  /* Optional: Prevents the image from repeating */
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    .container {
+        width: 400px;
+        background: transparent;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgb(0, 0, 0);
+        backdrop-filter: blur(2px);
+        
+        
+    
+    }
+    input {
+        padding: 10px;
+        width: 100%;             /* Make the input fields take full width of the form */
+        max-width: 378px;        /* Set a maximum width for inputs */
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        text-align: right;
+ 
+
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+}
+
+
+    
+    h1{
+        text-align: center;
+        color: black;
+    
+    }
+    
+    #taskInput {
+        width:100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    
+    }
+    #addTaskButton {
+        width: 100%;
+        padding: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    
+    }
+    
+    #addTaskButton:hover {
+        background: #218838
+    
+    
+    }
+    
+    ul{
+        list-style: none;
+        padding: 0;
+    
+    }
+     
+    li{ 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        background: #f4f4f4;
+        border-radius: 4px;
+    
+    }
+    
+    li.completed{
+        text-decoration: line-through;
+        color: gray;
+    
+    }
+    
+    .delete{
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 5px 10px;
+    
+    }
+    
+    .delete:hover{
+    background: #c82333;
+
+    
+    
+    }
+
+  
+    
+    
+
+    </style>
+    
+</head>
+<body>
+    <div class="bg-design">
+
+       
+    </div>
+    <div class="container">
+        <h1>لیستی کارە ئەنجامدراوەکان</h1>
+        <input class="task-name" type="text" id = "taskInput"  placeholder=" کاری ئەنجامدراو" >
+        <button id="addTaskButton"> ئەنجامدراوە</button>
+        <ul id="taskList"></ul>
+    
+    </div>
+
+   
+    <script>// Select elements
+        const taskInput = document.getElementById('taskInput');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const taskList = document.getElementById('taskList');
+        
+        // Add a new task
+        addTaskButton.addEventListener('click', () => {
+            const taskText = taskInput.value.trim();
+        
+            if (taskText === '') {
+                alert('تکایە ناوی کارەکە بنووسە!');
+                return;
+            }
+        
+            // Create a new list item
+            const listItem = document.createElement('li');
+            listItem.textContent = taskText;
+        
+            // Add functionality to mark as completed
+            listItem.addEventListener('click', () => {
+                listItem.classList.toggle('completed');
+            });
+        
+            // Add a delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete');
+            deleteButton.addEventListener('click', () => {
+                taskList.removeChild(listItem);
+            });
+        
+            listItem.appendChild(deleteButton);
+            taskList.appendChild(listItem);
+        
+            // Clear the input field
+            taskInput.value = '';
+        });
+
+        // Function to save tasks to local storage
+function saveTasks() {
+    const tasks = [];
+    const taskItems = document.querySelectorAll('li');
+    
+    taskItems.forEach((taskItem) => {
+        tasks.push({
+            text: taskItem.querySelector('span').textContent,
+            done: taskItem.classList.contains('done')
+        });
+    });
+    
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// Function to load tasks from local storage
+function loadTasks() {
+    const savedTasks = localStorage.getItem('tasks');
+    
+    if (savedTasks) {
+        const tasks = JSON.parse(savedTasks);
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            const taskContent = document.createElement('span');
+            taskContent.textContent = task.text;
+            li.appendChild(taskContent);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-btn');
+            deleteButton.addEventListener('click', () => {
+                taskList.removeChild(li);
+                saveTasks(); // Save after deletion
+            });
+            li.appendChild(deleteButton);
+
+            if (task.done) {
+                li.classList.add('done');
+            }
+
+            li.addEventListener('click', () => {
+                li.classList.toggle('done');
+                saveTasks(); // Save after completion
+            });
+
+            taskList.appendChild(li);
+        });
+    }
+}
+
+// Call loadTasks when the page loads
+window.addEventListener('load', loadTasks);
+
+// Save tasks whenever a new task is added or removed
+taskList.addEventListener('DOMSubtreeModified', saveTasks);
+
+
+
+
+
+
+
+        </script>
+</body>
+</html>
